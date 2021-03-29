@@ -4,11 +4,13 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const path = require("path");
 
+const KEYS = require("../config/keys");
 const app = express();
 
 //**************************route */
 const userRoute = require("./routes/user");
 const angularDeveloperRoute = require("./routes/angularDeveloper");
+const projectDeveloperRoute = require("./routes/project");
 
 //***************************global configuration**********************/
 app.use(bodyParser.json());
@@ -19,15 +21,12 @@ app.use("/images", express.static(path.join("src/images")));
 
 //************************database connection here ******************/
 mongoose
-  .connect(
-    "mongodb+srv://Sid:jBWcaYOiVj9oZw9M@cluster0.xz4rb.mongodb.net/capstone-db?retryWrites=true&w=majority",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
-    }
-  )
+  .connect(KEYS.MONGO_DB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  })
   .then(() => {
     console.log("and database connected!");
   })
@@ -35,6 +34,7 @@ mongoose
 
 app.use("/api", userRoute);
 app.use("/api", angularDeveloperRoute);
+app.use("/api", projectDeveloperRoute);
 
 app.listen(process.env.PORT || 9000, () => {
   console.log("server started");
