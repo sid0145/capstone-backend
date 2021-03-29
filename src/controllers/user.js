@@ -71,7 +71,8 @@ exports.getUser = (req, res) => {
         {
           email: fetchedUser.email,
           username: fetchedUser.username,
-          role: "admin",
+          role: fetchedUser.role,
+          userId: fetchedUser._id,
         },
         "secret_this_should_be_longer",
         { expiresIn: "1h" }
@@ -81,6 +82,7 @@ exports.getUser = (req, res) => {
         expiresIn: 3600,
         username: fetchedUser.username,
         role: fetchedUser.role,
+        userId: fetchedUser._id,
       });
     })
     .catch((err) => {

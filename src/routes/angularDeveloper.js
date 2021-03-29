@@ -5,6 +5,8 @@ const developerRoute = express.Router();
 
 const AngularDeveloper = require("../models/angularDeveloper");
 
+const checkAuth = require("../middleware/checkAuth");
+
 //***************checking mime type */
 const MIME_TYPE_MAP = {
   "image/png": "png",
@@ -31,6 +33,7 @@ const storage = multer.diskStorage({
 //*******************adding new developer **********************/
 developerRoute.post(
   "/addAngularDeveloper",
+  checkAuth,
   multer({ storage: storage }).single("image"),
   (req, res) => {
     const url = req.protocol + "://" + req.get("host");
@@ -67,7 +70,7 @@ developerRoute.post(
 );
 
 //*****************get All developers */
-developerRoute.get("/getAngularDevelopers", (req, res) => {
+developerRoute.get("/getAngularDevelopers", checkAuth, (req, res) => {
   const pageSize = +req.query.pagesize;
   const currentPage = +req.query.page;
   const developerQuery = AngularDeveloper.find();
@@ -96,7 +99,7 @@ developerRoute.get("/getAngularDevelopers", (req, res) => {
 
 //**************get a developer by id */
 
-developerRoute.get("/getAngularDeveloper/:id", (req, res) => {
+developerRoute.get("/getAngularDeveloper/:id", checkAuth, (req, res) => {
   AngularDeveloper.findById(req.params.id)
     .then((developer) => {
       if (developer) {
