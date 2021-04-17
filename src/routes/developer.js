@@ -3,7 +3,7 @@ const multer = require("multer");
 
 const developerRoute = express.Router();
 
-const AngularDeveloper = require("../models/angularDeveloper");
+const Developer = require("../models/developer");
 
 const checkAuth = require("../middleware/checkAuth");
 
@@ -32,15 +32,16 @@ const storage = multer.diskStorage({
 
 //*******************adding new developer **********************/
 developerRoute.post(
-  "/addAngularDeveloper",
+  "/addDeveloper",
   checkAuth,
   multer({ storage: storage }).single("image"),
   (req, res) => {
     const url = req.protocol + "://" + req.get("host");
-    const developer = new AngularDeveloper({
+    const developer = new Developer({
       fullname: req.body.name,
       email: req.body.email,
       imagePath: url + "/images/" + req.file.filename,
+      memberType: req.body.memberType,
       profession: req.body.profession,
       about: req.body.about,
       experience: req.body.experience,
@@ -69,21 +70,21 @@ developerRoute.post(
   }
 );
 
-//*****************get All developers */
+//*****************get Angular developers */
 developerRoute.get("/getAngularDevelopers", checkAuth, (req, res) => {
   const pageSize = +req.query.pagesize;
   const currentPage = +req.query.page;
-  const developerQuery = AngularDeveloper.find();
+  const developerQuery = Developer.find();
   let fetchedDevelopers;
   if (pageSize && currentPage) {
     developerQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
   }
 
   developerQuery
-    .find()
+    .find({ memberType: "Angular Developer" })
     .then((documents) => {
       fetchedDevelopers = documents;
-      return AngularDeveloper.countDocuments();
+      return Developer.countDocuments();
     })
     .then((count) => {
       res.status(200).json({
@@ -97,10 +98,42 @@ developerRoute.get("/getAngularDevelopers", checkAuth, (req, res) => {
     });
 });
 
-//**************get a developer by id */
+//**************angular  developer ends here */
 
-developerRoute.get("/getAngularDeveloper/:id", checkAuth, (req, res) => {
-  AngularDeveloper.findById(req.params.id)
+//***********************java developers */
+
+developerRoute.get("/getJavaDevelopers", checkAuth, (req, res) => {
+  const pageSize = +req.query.pagesize;
+  const currentPage = +req.query.page;
+  const developerQuery = Developer.find();
+  let fetchedDevelopers;
+  if (pageSize && currentPage) {
+    developerQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
+  }
+
+  developerQuery
+    .find({ memberType: "Java Developer" })
+    .then((documents) => {
+      fetchedDevelopers = documents;
+      return Developer.countDocuments();
+    })
+    .then((count) => {
+      res.status(200).json({
+        message: "fetched successfully",
+        developers: fetchedDevelopers,
+        maxDevelopers: count,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+//**************java developers ends here */
+
+//*************get developer by ID */
+developerRoute.get("/getDeveloperById/:id", checkAuth, (req, res) => {
+  Developer.findById(req.params.id)
     .then((developer) => {
       if (developer) {
         console.log(developer);

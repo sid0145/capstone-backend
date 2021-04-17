@@ -9,8 +9,9 @@ const app = express();
 
 //**************************route */
 const userRoute = require("./routes/user");
-const angularDeveloperRoute = require("./routes/angularDeveloper");
+const developerRoute = require("./routes/developer");
 const projectDeveloperRoute = require("./routes/project");
+const hireDeveloperRoute = require("./routes/hireDeveloper");
 
 //***************************global configuration**********************/
 app.use(bodyParser.json());
@@ -33,8 +34,9 @@ mongoose
   .catch((err) => {});
 
 app.use("/api", userRoute);
-app.use("/api", angularDeveloperRoute);
+app.use("/api", developerRoute);
 app.use("/api", projectDeveloperRoute);
+app.use("/api", hireDeveloperRoute);
 
 app.listen(process.env.PORT || 9000, () => {
   console.log("server started");

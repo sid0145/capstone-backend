@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const KEYS = require("../../config/keys");
 
 const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
@@ -8,8 +9,7 @@ const sendgridTransport = require("nodemailer-sendgrid-transport");
 const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
-      api_key:
-        "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",
+      api_key: KEYS.SEND_GRID_API_KEY,
     },
   })
 );
@@ -18,9 +18,9 @@ exports.createUser = (req, res) => {
   bcrypt.hash(req.body.password, 10).then((hash) => {
     const user = new User({
       username: req.body.username,
-      isAdmin: false,
       email: req.body.email,
       password: hash,
+      date: Date.now(),
     });
     user
       .save()
@@ -90,5 +90,86 @@ exports.getUser = (req, res) => {
         message: "Auth Failed!",
         erorr: err,
       });
+    });
+};
+
+//*****get all users */
+exports.getAllUsers = (req, res) => {
+  const pageSize = +req.query.pagesize;
+  const currentPage = +req.query.page;
+  const userQuery = User.find();
+  let fetchedUsers;
+  if (pageSize && currentPage) {
+    userQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
+  }
+  userQuery
+    .find({ role: "user" })
+    .sort("-date")
+    .then((data) => {
+      if (!data) {
+        return res.status(500).json({
+          erorr: err,
+        });
+      }
+      fetchedUsers = data;
+      return User.countDocuments();
+    })
+    .then((count) => {
+      res.status(200).json({
+        users: fetchedUsers,
+        maxUsers: count,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        erorr: err,
+      });
+    });
+};
+
+exports.getUserById = (req, res) => {
+  User.findOne({ _id: req.params.id })
+    .then((data) => {
+      if (!data) {
+        return res.status(500).json({
+          erorr: err,
+        });
+      }
+      return res.status(200).json(data);
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        erorr: err,
+      });
+    });
+};
+
+exports.deleteUser = (req, res) => {
+  User.deleteOne({ _id: req.params.id })
+    .then((data) => {
+      if (!data) {
+        return res.status(500).json({
+          erorr: err,
+        });
+      }
+      return res.status(200).json(data);
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        erorr: err,
+      });
+    });
+};
+
+exports.getCountUsers = (req, res) => {
+  User.find({ role: "user" })
+    .then((data) => {
+      return User.countDocuments();
+    })
+    .then((count) => {
+      return res.status(200).json({ count: count });
+    })
+    .catch((err) => {
+      return res.status(500).json(err);
     });
 };

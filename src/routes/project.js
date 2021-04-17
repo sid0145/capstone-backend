@@ -8,6 +8,11 @@ const projectController = require("../controllers/projectController");
 
 projectRouter.get("/getProjects", checkAuth, projectController.getProjects);
 projectRouter.get(
+  "/getProjectByCreator",
+  checkAuth,
+  projectController.getProjectByCreator
+);
+projectRouter.get(
   "/getProjectById/:id",
   checkAuth,
   projectController.getProjectById
@@ -17,6 +22,13 @@ projectRouter.put(
   "/editProject/:id",
   checkAuth,
   projectController.updateProjectById
+);
+
+projectRouter.put("/assignMe/:id", checkAuth, projectController.assignMe);
+projectRouter.put(
+  "/reviewProject/:id",
+  checkAuth,
+  projectController.reviewProject
 );
 projectRouter.delete(
   "/deleteProject/:id",
