@@ -9,15 +9,15 @@ const app = express();
 
 //**************************route */
 const userRoute = require("./routes/user");
-const angularDeveloperRoute = require("./routes/angularDeveloper");
+const developerRoute = require("./routes/developer");
 const projectDeveloperRoute = require("./routes/project");
+const hireDeveloperRoute = require("./routes/hireDeveloper");
+const contactRoute = require("./routes/contact");
 
 //***************************global configuration**********************/
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
-
-app.use("/images", express.static(path.join("src/images")));
 
 //************************database connection here ******************/
 mongoose
@@ -33,8 +33,10 @@ mongoose
   .catch((err) => {});
 
 app.use("/api", userRoute);
-app.use("/api", angularDeveloperRoute);
+app.use("/api", developerRoute);
 app.use("/api", projectDeveloperRoute);
+app.use("/api", hireDeveloperRoute);
+app.use("/api", contactRoute);
 
 app.listen(process.env.PORT || 9000, () => {
   console.log("server started");
